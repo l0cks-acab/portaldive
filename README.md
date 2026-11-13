@@ -1,10 +1,10 @@
 # Portal Dive
 
-![Portal Dive](https://raw.githubusercontent.com/l0cks-acab/portaldive/1124913e8f8fa2071395e648a0e058c9696583c5/docs/banner.png)
+![Portal Dive](https://raw.githubusercontent.com/l0cks-acab/portaldive/43849109154c3ba1cc29c061d34791c6819f250a/docs/banner.png)
 
 Client-side NeoForge mod that turns dimension changes into a hyperspace jump.
 
-![Walking into a Nether portal](https://raw.githubusercontent.com/l0cks-acab/portaldive/1124913e8f8fa2071395e648a0e058c9696583c5/docs/dive.gif)
+![Walking into a Nether portal](https://raw.githubusercontent.com/l0cks-acab/portaldive/43849109154c3ba1cc29c061d34791c6819f250a/docs/dive.gif)
 
 - **Windup:** stars start streaking and the FOV creeps out while you stand in a Nether portal.
 - **Dive:** the "Loading terrain" screen becomes a hyperspace tunnel. Streaks stretch, the view punches out, the screen shakes. It cruises for as long as chunks take to load (1.4 s minimum so fast loads still feel like a jump).
@@ -12,7 +12,7 @@ Client-side NeoForge mod that turns dimension changes into a hyperspace jump.
 - **Tinted per dimension:** Overworld blue-white, Nether red-orange, End purple. Modded dimensions get a colour from their id, or set one in the config.
 - Shows the destination name, has its own sounds and mutes the vanilla travel sound during the dive.
 
-Client only. Works on any server, vanilla included. Other mods' custom transition screens are left alone.
+Client only. Works on any server, vanilla included. Works with modded dimensions too (tested with The Aether, The Undergarden and Deeper and Darker), and takes over their own transition screens unless you turn that off.
 
 ## Config
 
@@ -24,6 +24,7 @@ Client only. Works on any server, vanilla included. Other mods' custom transitio
 | portals | true | Dive on Nether and End portals |
 | otherTransitions | true | Commands, modded portals, respawning in another dimension |
 | onJoin | false | Dive when joining a world |
+| replaceModScreens | true | Also replace other mods' transition screens |
 | portalWindup | true | Streaks while standing in a portal |
 | minSeconds / maxSeconds | 1.4 / 30 | Dive length bounds |
 | brakeSeconds | 1.6 | Arrival length |

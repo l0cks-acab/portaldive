@@ -57,7 +57,8 @@ public final class Dive {
             if (phase == Phase.DIVE && !(e.getNewScreen() instanceof LevelLoadingScreen)) arrive();
             return;
         }
-        if (next.getClass() != LevelLoadingScreen.class || !DiveConfig.ENABLED.get()) return; // another mod's custom screen wins
+        if (!DiveConfig.ENABLED.get()) return;
+        if (next.getClass() != LevelLoadingScreen.class && !DiveConfig.REPLACE_MOD_SCREENS.get()) return; // keep another mod's own screen
         boolean join = lastDim == null;
         boolean portal = next.reason != LevelLoadingScreen.Reason.OTHER;
         if (join ? !DiveConfig.ON_JOIN.get() : portal ? !DiveConfig.PORTALS.get() : !DiveConfig.OTHER_TRANSITIONS.get()) return;

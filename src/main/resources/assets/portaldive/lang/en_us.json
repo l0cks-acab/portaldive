@@ -8,6 +8,7 @@
   "portaldive.configuration.portals": "Dive on portals",
   "portaldive.configuration.otherTransitions": "Dive on other dimension changes",
   "portaldive.configuration.onJoin": "Dive when joining a world",
+  "portaldive.configuration.replaceModScreens": "Replace other mods' transition screens",
   "portaldive.configuration.portalWindup": "Portal windup streaks",
   "portaldive.configuration.minSeconds": "Minimum dive (s)",
   "portaldive.configuration.maxSeconds": "Maximum dive (s)",
