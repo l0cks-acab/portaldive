@@ -23,7 +23,7 @@ def shot(name):
     return Image.open(os.path.join(SH, name)).convert('RGB')
 
 
-def bg(img, tint=(14, 8, 24)):
+def bg(img, tint=(14, 8, 24), H=H):
     im = img.resize((W, H), Image.LANCZOS).filter(ImageFilter.GaussianBlur(16))
     im = ImageEnhance.Brightness(im).enhance(0.45)
     im = Image.blend(im, Image.new('RGB', (W, H), tint), 0.45)
@@ -226,6 +226,32 @@ def gallery():
         place(c, win, x, 330)
         ImageDraw.Draw(c).text((x + 4, 330 + win.height + 18), names[i], font=BODY(26), fill=cols[i] + (255,))
     save(c, '08-modded-dimensions.png')
+    combined()
+
+
+def grid(c, items, cols, w, crop, x0, y0, gap_x, gap_y):
+    for i, (src, label, col) in enumerate(items):
+        win = window(shot(src), w, crop)
+        x, y = x0 + (i % cols) * (w + gap_x), y0 + (i // cols) * (win.height + gap_y)
+        place(c, win, x, y)
+        ImageDraw.Draw(c).text((x + 4, y + win.height + 16), label, font=BODY(26), fill=col + (255,))
+
+
+# ---------- combined images for the description / README ----------
+def combined():
+    c = bg(shot('c04.png'), H=920)
+    glow_text(c, (70, 50), 'How a dive plays out', TITLE(58), radius=14, strength=160)
+    grid(c, [('b05.png', '1  Windup', PURPLE_HI), ('c03.png', '2  The jump', PURPLE_HI),
+             ('c04.png', '3  Cruise', PURPLE_HI), ('a15.png', '4  Hyper-braking', DIMS[0])],
+         2, 540, (160, 0, 1440, 720), 70, 165, 60, 70)
+    save(c, 'dive-steps.png')
+    c = bg(shot('a07.png'), H=830)
+    glow_text(c, (68, 50), 'Every dimension', TITLE(58), radius=14, strength=160)
+    grid(c, [('a07.png', 'The Overworld', DIMS[0]), ('b22.png', 'The Nether', DIMS[1]), ('c04.png', 'The End', DIMS[2]),
+             ('mod_aether.png', 'The Aether', (255, 214, 120)), ('mod_undergarden.png', 'The Undergarden', (236, 120, 220)),
+             ('mod_otherside.png', 'The Otherside', (196, 140, 255))],
+         3, 360, (200, 120, 1400, 900), 68, 165, 32, 72)
+    save(c, 'dimensions.png')
 
 
 ic = icon()
