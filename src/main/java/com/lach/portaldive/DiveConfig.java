@@ -14,6 +14,8 @@ public final class DiveConfig {
             .define("otherTransitions", true);
     public static final ModConfigSpec.BooleanValue ON_JOIN = B.comment("Dive when joining a world or server.")
             .define("onJoin", false);
+    public static final ModConfigSpec.BooleanValue REPLACE_MOD_SCREENS = B.comment("Also replace transition screens that other mods add for their dimensions.")
+            .define("replaceModScreens", true);
     public static final ModConfigSpec.BooleanValue PORTAL_WINDUP = B.comment("Stars start streaking while you stand in a Nether portal.")
             .define("portalWindup", true);
     public static final ModConfigSpec.DoubleValue MIN_SECONDS = B.comment("Shortest dive, so fast loads still feel like a jump.")

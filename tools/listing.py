@@ -214,6 +214,18 @@ def gallery():
         place(c, win, x, 340, col)
         ImageDraw.Draw(c).text((x + 4, 340 + win.height + 18), names[i], font=BODY(26), fill=col + (255,))
     save(c, '07-every-dimension.png')
+    # modded dimensions: the same dive into other mods' worlds
+    c = bg(shot('mod_undergarden.png'))
+    text_block(c, 70, 60, 'Modded dimensions', ['Works with any dimension from any mod, and', 'takes over their own transition screens too.'], 58)
+    names = ['The Aether', 'The Undergarden', 'The Otherside']
+    cols = [(255, 214, 120), (236, 120, 220), (196, 140, 255)]
+    for i, src in enumerate(['mod_aether.png', 'mod_undergarden.png', 'mod_otherside.png']):
+        img = shot(src).crop((200, 120, 1400, 900))
+        win = window(img, 360)
+        x = 70 + i * 392
+        place(c, win, x, 330)
+        ImageDraw.Draw(c).text((x + 4, 330 + win.height + 18), names[i], font=BODY(26), fill=cols[i] + (255,))
+    save(c, '08-modded-dimensions.png')
 
 
 ic = icon()
