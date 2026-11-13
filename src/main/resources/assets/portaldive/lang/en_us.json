@@ -1,0 +1,23 @@
+{
+  "portaldive.diving": "Diving to",
+  "portaldive.dimension.minecraft.overworld": "The Overworld",
+  "portaldive.dimension.minecraft.the_nether": "The Nether",
+  "portaldive.dimension.minecraft.the_end": "The End",
+  "portaldive.configuration.title": "Portal Dive",
+  "portaldive.configuration.enabled": "Enabled",
+  "portaldive.configuration.portals": "Dive on portals",
+  "portaldive.configuration.otherTransitions": "Dive on other dimension changes",
+  "portaldive.configuration.onJoin": "Dive when joining a world",
+  "portaldive.configuration.portalWindup": "Portal windup streaks",
+  "portaldive.configuration.minSeconds": "Minimum dive (s)",
+  "portaldive.configuration.maxSeconds": "Maximum dive (s)",
+  "portaldive.configuration.brakeSeconds": "Braking time (s)",
+  "portaldive.configuration.shake": "Screen shake",
+  "portaldive.configuration.fovKick": "FOV kick",
+  "portaldive.configuration.flash": "Arrival flash",
+  "portaldive.configuration.stars": "Star count",
+  "portaldive.configuration.volume": "Volume",
+  "portaldive.configuration.muteVanillaTravel": "Mute vanilla travel sound",
+  "portaldive.configuration.showDestination": "Show destination",
+  "portaldive.configuration.colours": "Dimension colours"
+}

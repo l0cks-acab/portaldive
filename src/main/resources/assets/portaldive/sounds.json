@@ -1,0 +1,5 @@
+{
+  "jump": {"sounds": [{"name": "portaldive:jump"}]},
+  "cruise": {"sounds": [{"name": "portaldive:cruise", "stream": true}]},
+  "brake": {"sounds": [{"name": "portaldive:brake"}]}
+}
