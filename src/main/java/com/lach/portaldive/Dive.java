@@ -42,6 +42,8 @@ public final class Dive {
     @Nullable static ResourceKey<Level> lastDim;
     @Nullable static CruiseSound cruise;
     static long lastFrame;
+    @Nullable static ResourceKey<Level> fromDim;
+    static long destSeenAt;
 
     private Dive() {}
 
@@ -65,6 +67,8 @@ public final class Dive {
 
     static void begin() {
         startSpeed = Math.max(STARS.speed, 0.2f);
+        fromDim = lastDim;
+        destSeenAt = 0;
         phase = Phase.DIVE;
         phaseStart = System.nanoTime();
         Minecraft mc = Minecraft.getInstance();
@@ -150,7 +154,7 @@ public final class Dive {
     static void renderDive(GuiGraphicsExtractor g, int w, int h) {
         Minecraft mc = Minecraft.getInstance();
         float t = seconds();
-        int tint = tint(mc.level == null ? null : mc.level.dimension());
+        int tint = diveTint(mc);
         float shakeAmt = shake() * (punch(t) * 6f + 0.6f);
         float cx = w / 2f + jitter(t, 1) * shakeAmt, cy = h / 2f + jitter(t, 2) * shakeAmt;
         float k = Math.min(t / ACCEL, 1f);
@@ -268,6 +272,21 @@ public final class Dive {
     static float jitter(float t, int seed) {
         return (float) (Math.sin(t * (31 + seed * 7.3) + seed) * 0.5 + Math.sin(t * (53 + seed * 3.1) + seed * 2) * 0.3
                 + Math.sin(t * (17 + seed) + seed * 5) * 0.2);
+    }
+
+    /** Leaves in the old dimension's colour and blends into the destination's once the new level is known. */
+    static int diveTint(Minecraft mc) {
+        ResourceKey<Level> to = mc.level == null ? null : mc.level.dimension();
+        if (fromDim == null) return tint(to);
+        int from = tint(fromDim);
+        if (to == null || to.equals(fromDim)) return from;
+        if (destSeenAt == 0) destSeenAt = System.nanoTime();
+        float k = Math.min((System.nanoTime() - destSeenAt) / 1e9f / 0.6f, 1f);
+        k = k * k * (3 - 2 * k);
+        int dest = tint(to);
+        return (int) Starfield.lerp(from >> 16 & 255, dest >> 16 & 255, k) << 16
+                | (int) Starfield.lerp(from >> 8 & 255, dest >> 8 & 255, k) << 8
+                | (int) Starfield.lerp(from & 255, dest & 255, k);
     }
 
     static float rgb(int c, int shift) { return (c >> shift & 255) / 255f; }

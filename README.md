@@ -1,6 +1,10 @@
 # Portal Dive
 
+![Portal Dive](https://raw.githubusercontent.com/l0cks-acab/portaldive/419e6659101af2f440a1c21db50aa33024e726d3/docs/banner.png)
+
 Client-side NeoForge mod that turns dimension changes into a hyperspace jump.
+
+![Walking into a Nether portal](https://raw.githubusercontent.com/l0cks-acab/portaldive/419e6659101af2f440a1c21db50aa33024e726d3/docs/dive.gif)
 
 - **Windup:** stars start streaking and the FOV creeps out while you stand in a Nether portal.
 - **Dive:** the "Loading terrain" screen becomes a hyperspace tunnel. Streaks stretch, the view punches out, the screen shakes. It cruises for as long as chunks take to load (1.4 s minimum so fast loads still feel like a jump).
