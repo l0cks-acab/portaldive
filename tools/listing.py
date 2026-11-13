@@ -9,8 +9,8 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 SH, OUT = sys.argv[1], sys.argv[2]
 os.makedirs(OUT, exist_ok=True)
 FD = '/mnt/skills/examples/canvas-design/canvas-fonts/'
-TITLE = lambda s: ImageFont.truetype(FD + 'Tektur-Medium.ttf', s)
-BODY = lambda s: ImageFont.truetype(FD + 'Outfit-Bold.ttf', s)
+TITLE = lambda s: ImageFont.truetype(FD + 'BricolageGrotesque-Bold.ttf', s)
+BODY = lambda s: ImageFont.truetype(FD + 'BricolageGrotesque-Regular.ttf', s)
 W, H = 1280, 720
 GOLD, GOLD_DIM = (232, 178, 58), (140, 100, 24)
 FRAME, FRAME_DARK = (120, 70, 190), (22, 16, 32)
@@ -37,23 +37,15 @@ def window(img, w, crop=None):
     if crop:
         img = img.crop(crop)
     h = round(img.height * w / img.width)
-    img = img.resize((w, h), Image.LANCZOS)
-    f = Image.new('RGBA', (w + 8, h + 8), FRAME_DARK + (255,))
-    d = ImageDraw.Draw(f)
-    d.rectangle([1, 1, w + 6, h + 6], outline=FRAME + (255,), width=2)
-    for x, y in [(0, 0), (w + 2, 0), (0, h + 2), (w + 2, h + 2)]:
-        d.rectangle([x, y, x + 5, y + 5], fill=PURPLE + (255,))
-    f.paste(img, (4, 4))
-    return f
+    return img.resize((w, h), Image.LANCZOS).convert('RGBA')
 
 
-def place(canvas, win, x, y, glow=PURPLE):
-    g = Image.new('RGBA', (win.width + 160, win.height + 160), (0, 0, 0, 0))
-    ImageDraw.Draw(g).rectangle([80, 80, 80 + win.width, 80 + win.height], fill=glow + (70,))
-    canvas.alpha_composite(g.filter(ImageFilter.GaussianBlur(40)), (x - 80, y - 80))
-    sh = Image.new('RGBA', (win.width + 80, win.height + 80), (0, 0, 0, 0))
-    ImageDraw.Draw(sh).rectangle([40, 50, 40 + win.width, 50 + win.height], fill=(0, 0, 0, 200))
-    canvas.alpha_composite(sh.filter(ImageFilter.GaussianBlur(18)), (x - 40, y - 40))
+def place(canvas, win, x, y, glow=None):
+    """Screenshot with a soft drop shadow, offset down and right."""
+    pad, off = 60, 14
+    sh = Image.new('RGBA', (win.width + pad * 2, win.height + pad * 2), (0, 0, 0, 0))
+    ImageDraw.Draw(sh).rectangle([pad + off, pad + off, pad + off + win.width, pad + off + win.height], fill=(0, 0, 0, 235))
+    canvas.alpha_composite(sh.filter(ImageFilter.GaussianBlur(20)), (x - pad, y - pad))
     canvas.alpha_composite(win, (x, y))
 
 
@@ -89,9 +81,7 @@ def text_block(canvas, x, y, title, lines, tsize=60):
         brand_text(canvas, (x, y), TITLE(tsize), radius=14, strength=170)
     else:
         glow_text(canvas, (x, y), title, TITLE(tsize), radius=14, strength=160)
-    y += tsize + 26
-    trace(canvas, x, x + 300, y)
-    y += 24
+    y += tsize + 34
     d = ImageDraw.Draw(canvas)
     for ln in lines:
         d.text((x, y), ln, font=BODY(26), fill=TEXT + (255,))
@@ -189,9 +179,8 @@ def banner(ic):
     c.alpha_composite(st, (BW - st.width, (BH - st.height) // 2))
     c.alpha_composite(ic.resize((320, 320), Image.LANCZOS), (60, 40))
     brand_text(c, (400, 70), TITLE(124), radius=22, strength=200)
-    trace(c, 404, 1000, 238)
-    ImageDraw.Draw(c).text((404, 262), 'Dimension travel at hyperspeed.', font=BODY(40), fill=TEXT + (255,))
-    chips(c, 406, 330)
+    ImageDraw.Draw(c).text((404, 236), 'Dimension travel at hyperspeed.', font=BODY(42), fill=TEXT + (255,))
+    chips(c, 406, 310)
     save(c, 'banner.png')
 
 
