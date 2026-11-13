@@ -6,13 +6,13 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.ReceivingLevelScreen;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.LevelLoadingScreen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.Level;
@@ -51,16 +51,16 @@ public final class Dive {
 
     @SubscribeEvent
     static void onScreenOpen(ScreenEvent.Opening e) {
-        if (!(e.getNewScreen() instanceof ReceivingLevelScreen next) || next instanceof DiveScreen) {
-            if (phase == Phase.DIVE && !(e.getNewScreen() instanceof ReceivingLevelScreen)) arrive();
+        if (!(e.getNewScreen() instanceof LevelLoadingScreen next) || next instanceof DiveScreen) {
+            if (phase == Phase.DIVE && !(e.getNewScreen() instanceof LevelLoadingScreen)) arrive();
             return;
         }
-        if (next.getClass() != ReceivingLevelScreen.class || !DiveConfig.ENABLED.get()) return; // another mod's custom screen wins
+        if (next.getClass() != LevelLoadingScreen.class || !DiveConfig.ENABLED.get()) return; // another mod's custom screen wins
         boolean join = lastDim == null;
-        boolean portal = next.reason != ReceivingLevelScreen.Reason.OTHER;
+        boolean portal = next.reason != LevelLoadingScreen.Reason.OTHER;
         if (join ? !DiveConfig.ON_JOIN.get() : portal ? !DiveConfig.PORTALS.get() : !DiveConfig.OTHER_TRANSITIONS.get()) return;
         if (phase != Phase.DIVE) begin();
-        e.setNewScreen(new DiveScreen(next.levelReceived, next.reason));
+        e.setNewScreen(new DiveScreen(next.loadTracker, next.reason));
     }
 
     static void begin() {
@@ -108,7 +108,7 @@ public final class Dive {
     @SubscribeEvent
     static void onSound(PlaySoundEvent e) {
         if (phase != Phase.IDLE && e.getSound() != null && DiveConfig.MUTE_VANILLA_TRAVEL.get()
-                && e.getSound().getLocation().equals(SoundEvents.PORTAL_TRAVEL.getLocation())) {
+                && e.getSound().getIdentifier().equals(SoundEvents.PORTAL_TRAVEL.location())) {
             e.setSound(null);
         }
     }
@@ -124,7 +124,7 @@ public final class Dive {
         float target = 0;
         if (DiveConfig.ENABLED.get() && DiveConfig.PORTAL_WINDUP.get() && mc.player != null && phase == Phase.IDLE) {
             target = net.minecraft.util.Mth.lerp(e.getPartialTick().getGameTimeDeltaPartialTick(false),
-                    mc.player.oSpinningEffectIntensity, mc.player.spinningEffectIntensity);
+                    mc.player.oPortalEffectIntensity, mc.player.portalEffectIntensity);
         }
         windup = phase == Phase.IDLE ? target : 0;
         STARS.ensure(DiveConfig.STARS.get());
@@ -147,7 +147,7 @@ public final class Dive {
     // ------------------------------------------------------------------ rendering
 
     /** Full-screen tunnel, drawn by {@link DiveScreen}. */
-    static void renderDive(GuiGraphics g, int w, int h) {
+    static void renderDive(GuiGraphicsExtractor g, int w, int h) {
         Minecraft mc = Minecraft.getInstance();
         float t = seconds();
         int tint = tint(mc.level == null ? null : mc.level.dimension());
@@ -175,13 +175,13 @@ public final class Dive {
             float a = Math.min((t - 0.3f) / 0.5f, 1f);
             int alpha = Math.max(4, (int) (a * 200)) << 24;
             Component name = dimName(mc.level.dimension());
-            g.drawCenteredString(mc.font, Component.translatable("portaldive.diving"), w / 2, h - 46, alpha | 0x9A9A9A);
-            g.drawCenteredString(mc.font, name, w / 2, h - 34, alpha | (tint & 0xFFFFFF | 0x404040));
+            g.centeredText(mc.font, Component.translatable("portaldive.diving"), w / 2, h - 46, alpha | 0x9A9A9A);
+            g.centeredText(mc.font, name, w / 2, h - 34, alpha | (tint & 0xFFFFFF | 0x404040));
         }
     }
 
     /** HUD layer: windup streaks while in a portal, braking streaks + flash after arrival. */
-    static void renderOverlay(GuiGraphics g, DeltaTracker delta) {
+    static void renderOverlay(GuiGraphicsExtractor g, DeltaTracker delta) {
         Minecraft mc = Minecraft.getInstance();
         if (phase == Phase.DIVE || mc.level == null) return;
         int w = g.guiWidth(), h = g.guiHeight();
@@ -227,7 +227,7 @@ public final class Dive {
             float t = seconds();
             mult = 1 + 0.45 * kick * Math.exp(-t * 4.5) * Math.cos(t * 7.5);
         }
-        if (mult != 1) e.setFOV(Math.min(e.getFOV() * mult, 170));
+        if (mult != 1) e.setFOV((float) Math.min(e.getFOV() * mult, 170));
     }
 
     @SubscribeEvent
@@ -273,7 +273,7 @@ public final class Dive {
     static float rgb(int c, int shift) { return (c >> shift & 255) / 255f; }
 
     private static List<? extends String> cachedList;
-    private static final Map<ResourceLocation, Integer> COLOURS = new HashMap<>();
+    private static final Map<Identifier, Integer> COLOURS = new HashMap<>();
 
     static int tint(@Nullable ResourceKey<Level> dim) {
         if (dim == null) return 0x8FCBFF;
@@ -283,19 +283,19 @@ public final class Dive {
             COLOURS.clear();
             for (String s : list) {
                 int eq = s.lastIndexOf('=');
-                ResourceLocation id = eq > 0 ? ResourceLocation.tryParse(s.substring(0, eq)) : null;
+                Identifier id = eq > 0 ? Identifier.tryParse(s.substring(0, eq)) : null;
                 if (id == null) continue;
                 try { COLOURS.put(id, Integer.parseInt(s.substring(eq + 1), 16)); } catch (NumberFormatException ignored) {}
             }
         }
-        Integer c = COLOURS.get(dim.location());
+        Integer c = COLOURS.get(dim.identifier());
         if (c != null) return c;
-        float hue = (dim.location().hashCode() & 0xFFFF) / 65535f;
+        float hue = (dim.identifier().hashCode() & 0xFFFF) / 65535f;
         return java.awt.Color.HSBtoRGB(hue, 0.6f, 1f) & 0xFFFFFF;
     }
 
     static Component dimName(ResourceKey<Level> dim) {
-        ResourceLocation id = dim.location();
+        Identifier id = dim.identifier();
         String key = "portaldive.dimension." + id.getNamespace() + "." + id.getPath().replace('/', '.');
         if (I18n.exists(key)) return Component.translatable(key);
         String vanillaKey = "dimension." + id.getNamespace() + "." + id.getPath().replace('/', '.');

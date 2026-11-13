@@ -1,6 +1,6 @@
 package com.lach.portaldive;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -15,8 +15,8 @@ import net.neoforged.neoforge.common.NeoForge;
 public class PortalDive {
     public static final String MODID = "portaldive";
 
-    public static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MODID, path);
+    public static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MODID, path);
     }
 
     public PortalDive(IEventBus modBus, ModContainer container) {
